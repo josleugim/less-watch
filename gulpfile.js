@@ -1,31 +1,35 @@
 'use strict';
 
 const gulp = require('gulp'),
-    gutil = require('gulp-util'),
-    plugins = require('gulp-load-plugins')({
+    $ = require('gulp-load-plugins')({
         rename: {
             'gulp-live-server': 'serve'
         }
-    });
+    }),
+    cssmin = require('gulp-cssmin'),
+    del = require('del'),
+    concat = require('gulp-concat');
 
-gulp.task('default', ['watch']);
-
-gulp.task('watch', function () {
-    gulp.watch('less/**/*.less', ['build-css']);
+gulp.task('styles', ['clean-styles'], function () {
+    return gulp
+        .src(['assets/less/style.less', 'assets/less/theme.less', 'assets/less/globals/var.less'])
+        .pipe($.plumber())
+        .pipe($.less({
+            paths: ['assets/less/', 'assets/less/globals']
+        }))
+        .pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
+        .pipe(concat('style.css'))
+        .pipe(gulp.dest('assets/css'))
 });
 
-gulp.task('build-css', function () {
-    return gulp.src('less/*.less')
-        .pipe(plugins.plumber())
-        .pipe(plugins.less())
-        .on('error', function (err) {
-            console.log(err);
-            gutil.log(err);
-            this.emit('end');
-        })
-        .pipe(plugins.cssmin())
-        .pipe(gulp.dest('css')).on('error', function (err) {
-            console.log(err);
-            gutil.log(err);
-        });
+gulp.task('clean-styles', function () {
+    clean('assets/css/style.css');
+});
+
+function clean(path) {
+    del(path);
+}
+
+gulp.task('less-watcher', function () {
+    gulp.watch('assets/less/**/*.less', ['styles']);
 });
