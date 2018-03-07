@@ -12,10 +12,10 @@ const gulp = require('gulp'),
 
 gulp.task('styles', ['clean-styles'], function () {
     return gulp
-        .src(['assets/less/style.less', 'assets/less/theme.less', 'assets/less/globals/var.less'])
+        .src(['assets/less/**/*.less'])
         .pipe($.plumber())
         .pipe($.less({
-            paths: ['assets/less/', 'assets/less/globals']
+            paths: ['assets/less/']
         }))
         .pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
         .pipe(concat('style.css'))
